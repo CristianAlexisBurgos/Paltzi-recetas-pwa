@@ -1,16 +1,27 @@
 import React from 'react';
-import { BrowserRouter, Route, Link } from 'react-router-dom';
+import { Router, Route, Link } from 'react-router-dom';
 import Home from './pages/Home'
 import Recipe from './pages/Recipe'
-import Timer from './pages/Timer'
+import Timer from './pages/Timer';
+import { createBrowserHistory } from 'history';
+import ReactGA from 'react-ga';
+import IfOffline from './components/ifOnline';
 import './App.css';
+
+const history = createBrowserHistory();
+ReactGA.initialize('UA-000000-01');
+ReactGA.pageview(`${window.location.pathname}${window.location.search}`);
+history.listen(() => {
+  ReactGA.pageview(`${window.location.pathname}${window.location.search}`);
+});
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router history={history}>
       <div>
         <header>
-          <Link to="/">Recetass</Link>
+          <Link to="/">Recetas <IfOffline>Offline</IfOffline></Link>
+          <Link to='/timer' className='timerLink'>T</Link>
         </header>
 
         <main>
@@ -19,7 +30,7 @@ function App() {
           <Route path="/timer" component={Timer} />
         </main>
       </div>
-    </BrowserRouter>
+    </Router>
   );
 }
 

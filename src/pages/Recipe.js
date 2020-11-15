@@ -13,13 +13,27 @@ export default class Recipes extends Component {
   async componentDidMount() {
     let recipe = null
     try {
-
       recipe = await mealdb.getRecipe(this.props.match.params.recipeId);
       console.log('RECIPE', recipe)
     } catch(e) {
       recipe = null
     }
     this.setState({ recipe, isLoading: false })
+  }
+
+  compartir = (e) => {
+    e.preventDefault()
+    if (!navigator.share) {
+      alert('Tu navegador no soporta est caracteristica')
+      return;
+    }
+    const {recipe} = this.state;
+    navigator.share({
+      title: `${recipe.name}`,
+      text: 'Receta de Platzi',
+      url: document.location.href
+    }).then(() => alert('Contenido compartido'))
+      .catch((error) => alert('Error'))
   }
 
   render() {
@@ -46,6 +60,7 @@ export default class Recipes extends Component {
             <p>{ recipe.origin }</p>
           </div>
           <div>
+            <a onClick={this.compartir}>Compartir</a>
           </div>
         </div>
 

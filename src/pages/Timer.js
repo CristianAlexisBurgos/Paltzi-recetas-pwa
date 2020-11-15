@@ -3,11 +3,23 @@ import React, { Component } from 'react';
 export default class Timer extends Component {
   constructor(props) {
     super(props);
-    this.state = { timer: 3, timeLeaft: 0 };
+    this.state = { timer: 3, timeLeft: 0 };
   }
 
   start = async () => {
     // TODO: Chequear permisos
+    if ( !('Notification' in window) || !('serviceWorker' in navigator) ) {
+      return alert('Tu navegador no soporta notificaciones');
+    }
+    if (Notification.permission === 'default') {
+      return await Notification.requestPermission();
+    }
+    if (Notification.permission === 'blocked') {
+      return alert('Bloquaste las notificaciones')
+    }
+    if (Notification.permission !== 'granted') {
+      return;
+    }
 
     var timer = this.state.timer
     this.setState({ timeLeft: timer })
@@ -24,6 +36,12 @@ export default class Timer extends Component {
 
   showNotification = async () => {
     // TODO: Enviar Notificación
+    const registration = await navigator.serviceWorker.getRegistration();
+    if (!registration) return alert('NO hay un service worker');
+    registration.showNotification('Listo el timer', {
+      body: 'Ding ding ding',
+      
+    })
   }
 
   handleChange = (e) => {
@@ -48,7 +66,7 @@ export default class Timer extends Component {
           <button onClick={ this.start }>Start</button>
         </div>
       :
-        <div className="timeLeft">{ timeLeft }s</div>
+        <div className="timeLeft">{ timeLeft }</div>
       }
     </div>
   }
